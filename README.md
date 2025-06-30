@@ -1,6 +1,4 @@
 # 🏥 Lotus
-
-## 🎯 Overview
 Lotus is a comprehensive healthcare system application designed to enhance interactions between users, including patients, doctors, and administrators. The platform offers a range of features such as appointment bookings, detailed patient information views, and more, aimed at streamlining healthcare management and overall improving user experience.
 
 ## 📈 Development Log
