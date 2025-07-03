@@ -1,4 +1,21 @@
+-- =====-- ========================================
+-- 1. DOCTORS TABLE
 -- ========================================
+CREATE TABLE IF NOT EXISTS doctors (
+    doctor_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    specialization VARCHAR(100) NOT NULL,
+    qualification VARCHAR(200),
+    experience_years INT DEFAULT 0,
+    background TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+);===================
 -- Lotus Healthcare System Database Schema
 -- ========================================
 
@@ -121,6 +138,35 @@ CREATE TABLE IF NOT EXISTS notifications (
     booking_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (booking_id) REFERENCES bookings(booking_id) ON DELETE SET NULL
+);
+
+-- ========================================
+-- 0. USERS TABLE (Authentication)
+-- ========================================
+CREATE TABLE IF NOT EXISTS users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL, -- In production, store hashed passwords
+    email VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    user_type ENUM('PATIENT', 'DOCTOR', 'ADMIN') NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    last_login TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ========================================
+-- 0.1 ACCESS LOGS TABLE (Authorization tracking)
+-- ========================================
+CREATE TABLE IF NOT EXISTS access_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    details TEXT,
+    access_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- ========================================
@@ -283,38 +329,24 @@ END //
 
 DELIMITER ;
 
--- ========================================
--- TRIGGERS FOR AUTOMATIC NOTIFICATIONS
--- ========================================
+-- Insert sample users for testing
+INSERT INTO users (username, password, email, name, user_type) VALUES
+('admin', 'admin123', 'admin@lotus.com', 'System Administrator', 'ADMIN'),
+('drjohnson', 'doctor123', 'sarah.johnson@lotus.com', 'Dr. Sarah Johnson', 'DOCTOR'),
+('drchen', 'doctor123', 'michael.chen@lotus.com', 'Dr. Michael Chen', 'DOCTOR'),
+('drrodriguez', 'doctor123', 'emily.rodriguez@lotus.com', 'Dr. Emily Rodriguez', 'DOCTOR'),
+('drwilson', 'doctor123', 'david.wilson@lotus.com', 'Dr. David Wilson', 'DOCTOR'),
+('drthompson', 'doctor123', 'lisa.thompson@lotus.com', 'Dr. Lisa Thompson', 'DOCTOR'),
+('patient1', 'patient123', 'john.smith@email.com', 'John Smith', 'PATIENT'),
+('patient2', 'patient123', 'maria.garcia@email.com', 'Maria Garcia', 'PATIENT'),
+('patient3', 'patient123', 'robert.johnson@email.com', 'Robert Johnson', 'PATIENT'),
+('patient4', 'patient123', 'jennifer.brown@email.com', 'Jennifer Brown', 'PATIENT'),
+('patient5', 'patient123', 'william.davis@email.com', 'William Davis', 'PATIENT');
 
-DELIMITER //
+-- Update doctors table to link with users
+UPDATE doctors SET user_id = (SELECT user_id FROM users WHERE email = doctors.email);
 
--- Trigger to create notifications when a booking is created
-CREATE TRIGGER after_booking_insert
-AFTER INSERT ON bookings
-FOR EACH ROW
-BEGIN
-    -- Notification to patient
-    INSERT INTO notifications (recipient_type, recipient_id, message_type, subject, message, booking_id)
-    VALUES (
-        'PATIENT', 
-        NEW.patient_id, 
-        'BOOKING_CONFIRMATION',
-        'Appointment Confirmed',
-        CONCAT('Your appointment has been scheduled for ', NEW.appointment_date, ' at ', NEW.appointment_time),
-        NEW.booking_id
-    );
-    
-    -- Notification to doctor
-    INSERT INTO notifications (recipient_type, recipient_id, message_type, subject, message, booking_id)
-    VALUES (
-        'DOCTOR', 
-        NEW.doctor_id, 
-        'BOOKING_CONFIRMATION',
-        'New Appointment Scheduled',
-        CONCAT('New appointment scheduled for ', NEW.appointment_date, ' at ', NEW.appointment_time),
-        NEW.booking_id
-    );
-END //
+-- Update patients table to link with users 
+UPDATE patients SET user_id = (SELECT user_id FROM users WHERE email = patients.email);
 
 
