@@ -18,8 +18,6 @@ public class Application {
 
        JFrame frame = new ApplicationWindow();
        frame.setVisible(true);
-    
-        // Print a message indicating the application has started
-        System.out.println("🏥 Lotus Healthcare System is running...");
+       System.out.println("Lotus Healthcare System is live");
     }
 }

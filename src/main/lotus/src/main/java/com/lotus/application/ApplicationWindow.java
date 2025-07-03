@@ -1,4 +1,5 @@
 package com.lotus.application;
+import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -24,7 +25,6 @@ public class ApplicationWindow extends JFrame {
         this.setSize(Configuration.WINDOW_SIZE);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
-
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -33,5 +33,6 @@ public class ApplicationWindow extends JFrame {
         });
 
         this.handler = new ViewHandler(this);
+        this.handler.loadView("loginView");
     }
 }
