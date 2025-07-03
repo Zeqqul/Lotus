@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS doctors (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     phone VARCHAR(20),
-    specialization VARCHAR(100) NOT NULL,
+    specialisation VARCHAR(100) NOT NULL,
     qualification VARCHAR(200),
     experience_years INT DEFAULT 0,
     background TEXT,
@@ -34,8 +34,6 @@ CREATE TABLE IF NOT EXISTS patients (
     date_of_birth DATE,
     gender ENUM('MALE', 'FEMALE', 'OTHER'),
     address TEXT,
-    emergency_contact_name VARCHAR(100),
-    emergency_contact_phone VARCHAR(20),
     medical_history TEXT,
     current_doctor_id INT,
     is_active BOOLEAN DEFAULT TRUE,
@@ -130,7 +128,7 @@ CREATE TABLE IF NOT EXISTS notifications (
 -- ========================================
 CREATE INDEX idx_patients_email ON patients(email);
 CREATE INDEX idx_doctors_email ON doctors(email);
-CREATE INDEX idx_doctors_specialization ON doctors(specialization);
+CREATE INDEX idx_doctors_specialisation ON doctors(specialisation);
 CREATE INDEX idx_bookings_date ON bookings(appointment_date);
 CREATE INDEX idx_bookings_patient ON bookings(patient_id);
 CREATE INDEX idx_bookings_doctor ON bookings(doctor_id);
@@ -142,7 +140,7 @@ CREATE INDEX idx_notifications_recipient ON notifications(recipient_type, recipi
 -- ========================================
 
 -- Insert sample doctors
-INSERT INTO doctors (name, email, phone, specialization, qualification, experience_years, background) VALUES
+INSERT INTO doctors (name, email, phone, specialisation, qualification, experience_years, background) VALUES
 ('Dr. Sarah Johnson', 'sarah.johnson@lotus.com', '+1-555-0101', 'Cardiology', 'MD, PhD in Cardiology', 15, 'Specialist in heart diseases with 15 years of experience'),
 ('Dr. Michael Chen', 'michael.chen@lotus.com', '+1-555-0102', 'Pediatrics', 'MD, Board Certified Pediatrician', 12, 'Child healthcare specialist with focus on preventive care'),
 ('Dr. Emily Rodriguez', 'emily.rodriguez@lotus.com', '+1-555-0103', 'Dermatology', 'MD, Dermatology Residency', 8, 'Skin care specialist with expertise in cosmetic and medical dermatology'),
@@ -213,7 +211,7 @@ SELECT
     p.name AS patient_name,
     p.email AS patient_email,
     d.name AS doctor_name,
-    d.specialization,
+    d.specialisation,
     d.phone AS doctor_phone
 FROM bookings b
 JOIN patients p ON b.patient_id = p.patient_id
@@ -228,7 +226,7 @@ SELECT
     da.end_time,
     da.is_available,
     d.name AS doctor_name,
-    d.specialization,
+    d.specialisation,
     d.email AS doctor_email,
     d.phone AS doctor_phone
 FROM doctor_availability da
